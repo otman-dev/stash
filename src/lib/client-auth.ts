@@ -32,9 +32,13 @@ export function useAuth() {
    */
   const googleLogin = async () => {
     try {
-      await signIn("google", { callbackUrl: "/dashboard" });
-      return { success: true };
+      // Changed to force redirect in the browser instead of handling in catch
+      return await signIn("google", { 
+        callbackUrl: "/dashboard",
+        redirect: true
+      });
     } catch (error) {
+      console.error("Google auth error:", error);
       return { success: false, error: "Google authentication failed" };
     }
   };

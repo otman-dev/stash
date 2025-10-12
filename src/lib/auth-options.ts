@@ -44,7 +44,7 @@ async function initializeUserCollections(db: any, userId: string) {
 export const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(clientPromise) as any,
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development',
+  debug: process.env.NEXTAUTH_DEBUG === 'true' || process.env.NODE_ENV === 'development',
   // Make sure the callback URL works in both production and development
   useSecureCookies: process.env.NODE_ENV === 'production',
   cookies: {
@@ -62,6 +62,13 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -118,6 +125,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub;
         session.user.role = token.role as string || "user";
       }
+      console.log("Session callback:", { sessionUser: session?.user });
       return session;
     },
     async jwt({ token, user, account }) {
@@ -125,15 +133,23 @@ export const authOptions: NextAuthOptions = {
         token.userId = user.id;
         token.role = (user as any).role || "user";
       }
+      console.log("JWT callback:", { tokenSub: token.sub, userId: user?.id });
       return token;
     },
     async signIn({ user, account, profile }) {
       try {
-        if (account?.provider === 'google') {
+        console.log('SignIn callback triggered:', { 
+          provider: account?.provider,
+          email: user.email,
+          name: user.name
+        });
+        
+        if (account?.provider === 'google' && user.email) {
           const db = await getDb();
           
           // Check if the user already exists in our database
           const existingUser = await db.collection('users').findOne({ email: user.email });
+          console.log('Existing user check:', { found: !!existingUser });
           
           // If this is a new user coming from Google, set up their collections
           if (!existingUser || (existingUser && !existingUser.hasInitializedCollections)) {
@@ -161,6 +177,7 @@ export const authOptions: NextAuthOptions = {
                   } 
                 }
               );
+              console.log('User collections initialized for:', user.email);
             } else {
               console.log('User not found in database after OAuth sign-in:', user.email);
             }
