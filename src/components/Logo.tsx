@@ -1,0 +1,17 @@
+export default function Logo({ className = 'h-8 w-auto' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <rect width="48" height="48" rx="10" fill="url(#gradient)" />
+      <defs>
+        <linearGradient id="gradient" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#3B82F6" />
+          <stop offset="1" stopColor="#1E40AF" />
+        </linearGradient>
+      </defs>
+      <path d="M14 28c2-5 10-8 16-7" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M18 33c3-4 8-6 13-6" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="22" cy="16" r="3" fill="#FEF3C7" />
+      <circle cx="34" cy="23" r="2" fill="#FEF3C7" />
+    </svg>
+  )
+}

@@ -1,0 +1,109 @@
+{
+  "common": {
+    "stash": "Stash",
+    "tagline": "Inventory Management System",
+    "signIn": "Sign In",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "privateUseNotice": "This system is for private use only. Unauthorized access is prohibited.",
+    "updatedToday": "Updated today",
+    "totalProducts": "Total Products",
+    "viewAll": "View All"
+  },
+  "home": {
+    "hero": {
+      "title": "Manage Your Inventory",
+      "titleHighlight": "Smarter",
+      "description": "Stash is a powerful inventory management system designed to streamline your business operations, track products, and optimize your inventory levels."
+    },
+    "features": {
+      "title": "Powerful Features",
+      "subtitle": "Everything you need to manage your inventory efficiently",
+      "productManagement": {
+        "title": "Product Management",
+        "description": "Easily add, edit, and organize your products with detailed information and media."
+      },
+      "categoryOrganization": {
+        "title": "Category Organization",
+        "description": "Create and manage categories to keep your inventory organized and easy to navigate."
+      },
+      "analyticsReports": {
+        "title": "Analytics & Reports",
+        "description": "Track inventory levels, monitor trends, and generate detailed reports for better decision making."
+      }
+    },
+    "footer": {
+      "allRightsReserved": "All rights reserved.",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "contact": "Contact",
+      "privateUse": "For private use only"
+    }
+  },
+  "dashboard": {
+    "overview": "Dashboard Overview",
+    "welcome": "Welcome back! Here's what's happening with your inventory today.",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "thisYear": "This Year",
+    "products": "Products",
+    "categories": "Categories",
+    "totalUnits": "Total Units",
+    "increase": "increase",
+    "recentProducts": "Recent Products",
+    "inventoryStatus": "Inventory Status",
+    "noProductsYet": "No products yet",
+    "startAdding": "Get started by adding your first product",
+    "addProduct": "Add Product",
+    "generateReport": "Generate Inventory Report",
+    "lowStockItems": "Low stock items",
+    "outOfStock": "Out of stock",
+    "wellStocked": "Well stocked",
+    "items": "items",
+    "unitsAvailable": "units available",
+    "noUnitsSpecified": "No units specified"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "categories": "Categories",
+    "logout": "Logout",
+    "needHelp": "Need help?",
+    "checkDocs": "Check our documentation for tips and tutorials.",
+    "viewDocumentation": "View Documentation"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "loginSubtitle": "Access your inventory dashboard",
+    "emailAddress": "Email address",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "signingIn": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "registerNow": "Register now",
+    "signInWithGoogle": "Sign in with Google",
+    "signUpWithGoogle": "Sign up with Google",
+    "orContinueWith": "or continue with",
+    "logout": "Logout",
+    "authenticating": "Authenticating...",
+    "accountCreated": "Account created successfully",
+    "loginSuccess": "Login successful",
+    "errorMessages": {
+      "invalidCredentials": "Invalid email or password",
+      "passwordMismatch": "Passwords do not match",
+      "emailExists": "An account with this email already exists",
+      "googleAuthFailed": "Google authentication failed",
+      "googleAccountExists": "You already have an account with this Gmail address"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Sign up for your inventory dashboard",
+      "name": "Full name",
+      "confirmPassword": "Confirm password",
+      "termsAgree": "I agree to the Terms of Service and Privacy Policy",
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "registering": "Creating your account..."
+    }
+  }
+}

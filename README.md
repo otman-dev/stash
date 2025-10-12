@@ -1,3 +1,26 @@
+# Stash
+
+Personal inventory dashboard built with Next.js, TypeScript and Tailwind CSS.
+
+Features:
+- Email/password login (JWT in httpOnly cookie)
+- Manage categories
+- Manage products (name, description, media URL, units in stock)
+- REST API routes under `/api`
+
+Environment variables:
+- MONGODB_URI - your MongoDB connection string
+- MONGODB_DB - optional, database name (default: stash)
+- JWT_SECRET - secret for signing auth tokens
+
+Run locally:
+
+```powershell
+npm install
+npm run dev
+```
+
+After you provide a MongoDB connection, the API will create `users`, `categories`, and `products` collections as needed.
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

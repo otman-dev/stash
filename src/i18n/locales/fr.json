@@ -1,0 +1,85 @@
+{
+  "common": {
+    "stash": "Stash",
+    "tagline": "Système de Gestion d'Inventaire",
+    "signIn": "Connexion",
+    "getStarted": "Commencer",
+    "learnMore": "En Savoir Plus",
+    "privateUseNotice": "Ce système est réservé à un usage privé. Tout accès non autorisé est interdit.",
+    "updatedToday": "Mis à jour aujourd'hui",
+    "totalProducts": "Total des produits",
+    "viewAll": "Voir tout"
+  },
+  "home": {
+    "hero": {
+      "title": "Gérez Votre Inventaire",
+      "titleHighlight": "Intelligemment",
+      "description": "Stash est un puissant système de gestion d'inventaire conçu pour rationaliser vos opérations commerciales, suivre les produits et optimiser vos niveaux de stock."
+    },
+    "features": {
+      "title": "Fonctionnalités Puissantes",
+      "subtitle": "Tout ce dont vous avez besoin pour gérer efficacement votre inventaire",
+      "productManagement": {
+        "title": "Gestion des Produits",
+        "description": "Ajoutez, modifiez et organisez facilement vos produits avec des informations détaillées et des médias."
+      },
+      "categoryOrganization": {
+        "title": "Organisation par Catégorie",
+        "description": "Créez et gérez des catégories pour maintenir votre inventaire organisé et facile à naviguer."
+      },
+      "analyticsReports": {
+        "title": "Analyses & Rapports",
+        "description": "Suivez les niveaux d'inventaire, surveillez les tendances et générez des rapports détaillés pour une meilleure prise de décision."
+      }
+    },
+    "footer": {
+      "allRightsReserved": "Tous droits réservés.",
+      "terms": "Conditions",
+      "privacy": "Confidentialité",
+      "contact": "Contact",
+      "privateUse": "Usage privé uniquement"
+    }
+  },
+  "dashboard": {
+    "overview": "Aperçu du Tableau de Bord",
+    "welcome": "Bon retour ! Voici ce qui se passe avec votre inventaire aujourd'hui.",
+    "thisWeek": "Cette Semaine",
+    "thisMonth": "Ce Mois",
+    "thisYear": "Cette Année",
+    "products": "Produits",
+    "categories": "Catégories",
+    "totalUnits": "Total des Unités",
+    "increase": "augmentation",
+    "recentProducts": "Produits Récents",
+    "inventoryStatus": "État de l'Inventaire",
+    "noProductsYet": "Pas encore de produits",
+    "startAdding": "Commencez par ajouter votre premier produit",
+    "addProduct": "Ajouter un Produit",
+    "generateReport": "Générer un Rapport d'Inventaire",
+    "lowStockItems": "Articles en stock limité",
+    "outOfStock": "Rupture de stock",
+    "wellStocked": "Bien approvisionné",
+    "items": "articles",
+    "unitsAvailable": "unités disponibles",
+    "noUnitsSpecified": "Aucune unité spécifiée"
+  },
+  "nav": {
+    "dashboard": "Tableau de Bord",
+    "products": "Produits",
+    "categories": "Catégories",
+    "logout": "Déconnexion",
+    "needHelp": "Besoin d'aide ?",
+    "checkDocs": "Consultez notre documentation pour des conseils et tutoriels.",
+    "viewDocumentation": "Voir la Documentation"
+  },
+  "auth": {
+    "loginTitle": "Connexion",
+    "loginSubtitle": "Accédez à votre tableau de bord d'inventaire",
+    "emailAddress": "Adresse e-mail",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "signingIn": "Connexion en cours...",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "registerNow": "Inscrivez-vous maintenant"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "common": {
+    "stash": "ستاش",
+    "tagline": "نظام إدارة المخزون",
+    "signIn": "تسجيل الدخول",
+    "getStarted": "ابدأ الآن",
+    "learnMore": "معرفة المزيد",
+    "privateUseNotice": "هذا النظام للاستخدام الخاص فقط. الوصول غير المصرح به محظور.",
+    "updatedToday": "تم التحديث اليوم",
+    "totalProducts": "إجمالي المنتجات",
+    "viewAll": "عرض الكل"
+  },
+  "home": {
+    "hero": {
+      "title": "أدر مخزونك",
+      "titleHighlight": "بذكاء",
+      "description": "ستاش هو نظام قوي لإدارة المخزون مصمم لتبسيط عمليات عملك، وتتبع المنتجات، وتحسين مستويات المخزون."
+    },
+    "features": {
+      "title": "ميزات قوية",
+      "subtitle": "كل ما تحتاجه لإدارة مخزونك بكفاءة",
+      "productManagement": {
+        "title": "إدارة المنتجات",
+        "description": "أضف وعدّل ونظّم منتجاتك بسهولة مع معلومات ووسائط مفصلة."
+      },
+      "categoryOrganization": {
+        "title": "تنظيم الفئات",
+        "description": "إنشاء وإدارة الفئات للحفاظ على مخزونك منظم وسهل التنقل."
+      },
+      "analyticsReports": {
+        "title": "التحليلات والتقارير",
+        "description": "تتبع مستويات المخزون، ومراقبة الاتجاهات، وإنشاء تقارير مفصلة لاتخاذ قرارات أفضل."
+      }
+    },
+    "footer": {
+      "allRightsReserved": "جميع الحقوق محفوظة.",
+      "terms": "الشروط",
+      "privacy": "الخصوصية",
+      "contact": "اتصل بنا",
+      "privateUse": "للاستخدام الخاص فقط"
+    }
+  },
+  "dashboard": {
+    "overview": "نظرة عامة على لوحة المعلومات",
+    "welcome": "مرحبًا بعودتك! إليك ما يحدث مع مخزونك اليوم.",
+    "thisWeek": "هذا الأسبوع",
+    "thisMonth": "هذا الشهر",
+    "thisYear": "هذا العام",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "totalUnits": "إجمالي الوحدات",
+    "increase": "زيادة",
+    "recentProducts": "المنتجات الحديثة",
+    "inventoryStatus": "حالة المخزون",
+    "noProductsYet": "لا توجد منتجات حتى الآن",
+    "startAdding": "ابدأ بإضافة أول منتج لك",
+    "addProduct": "إضافة منتج",
+    "generateReport": "إنشاء تقرير المخزون",
+    "lowStockItems": "العناصر منخفضة المخزون",
+    "outOfStock": "نفدت الكمية",
+    "wellStocked": "مخزون جيد",
+    "items": "عناصر",
+    "unitsAvailable": "وحدات متاحة",
+    "noUnitsSpecified": "لم يتم تحديد الوحدات"
+  },
+  "nav": {
+    "dashboard": "لوحة المعلومات",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "logout": "تسجيل الخروج",
+    "needHelp": "تحتاج مساعدة؟",
+    "checkDocs": "تحقق من وثائقنا للحصول على نصائح وبرامج تعليمية.",
+    "viewDocumentation": "عرض الوثائق"
+  },
+  "auth": {
+    "loginTitle": "تسجيل الدخول",
+    "loginSubtitle": "الوصول إلى لوحة معلومات المخزون الخاصة بك",
+    "emailAddress": "عنوان البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "signingIn": "جاري تسجيل الدخول...",
+    "noAccount": "ليس لديك حساب؟",
+    "registerNow": "سجل الآن"
+  }
+}
