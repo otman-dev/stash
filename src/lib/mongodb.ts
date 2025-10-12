@@ -6,10 +6,12 @@ if (!process.env.MONGODB_URI) {
 
 const uri = process.env.MONGODB_URI;
 const options = {
-  // Options for better NextAuth.js compatibility
+  // Options for better NextAuth.js and MongoDB 6.x compatibility
   connectTimeoutMS: 30000,
-  socketTimeoutMS: 30000,
+  socketTimeoutMS: 30000, 
   serverSelectionTimeoutMS: 5000,
+  maxPoolSize: 10,
+  minPoolSize: 5,
   // Remove directConnection for SRV URIs
 };
 
