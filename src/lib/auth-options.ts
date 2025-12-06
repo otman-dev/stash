@@ -128,12 +128,23 @@ export const authOptions: NextAuthOptions = {
       console.log("Session callback:", { sessionUser: session?.user });
       return session;
     },
-    async jwt({ token, user, account }) {
-      if (user) {
-        token.userId = user.id;
-        token.role = (user as any).role || "user";
+    async jwt({ token, user, account, profile }) {
+      // Initial sign in - persist the user data to the token
+      if (account && user) {
+        console.log("JWT callback - Initial sign in:", { 
+          provider: account.provider, 
+          userId: user.id, 
+          email: user.email 
+        });
+        return {
+          ...token,
+          userId: user.id,
+          role: (user as any).role || "user",
+          accessToken: account.access_token,
+          refreshToken: account.refresh_token,
+        };
       }
-      console.log("JWT callback:", { tokenSub: token.sub, userId: user?.id });
+      console.log("JWT callback - Subsequent request:", { tokenSub: token.sub });
       return token;
     },
     async signIn({ user, account, profile }) {
