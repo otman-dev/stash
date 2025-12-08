@@ -51,10 +51,17 @@ export function useAuth() {
     router.push("/");
   };
 
+  // Include role from session
+  const user = session?.user ? {
+    ...session.user,
+    role: session.user.role || 'user',
+  } : undefined;
+
   return {
-    user: session?.user,
+    user,
     isAuthenticated: !!session?.user,
     isLoading: status === "loading",
+    isAdmin: session?.user?.role === 'admin',
     login,
     googleLogin,
     logout,

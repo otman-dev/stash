@@ -6,6 +6,16 @@ import { clientPromise } from "@/lib/mongodb";
 import { getDb } from "@/lib/mongodb";
 import { verifyPassword } from "@/lib/auth";
 
+// List of admin emails - these users will automatically get admin role
+const ADMIN_EMAILS = [
+  'otman.mouhib.career@gmail.com',
+];
+
+// Function to check if email should be admin
+function isAdminEmail(email: string): boolean {
+  return ADMIN_EMAILS.includes(email.toLowerCase());
+}
+
 // Function to initialize user collections
 async function initializeUserCollections(db: any, userId: string) {
   try {
@@ -136,15 +146,31 @@ export const authOptions: NextAuthOptions = {
           userId: user.id, 
           email: user.email 
         });
+        
+        // Check if user should be admin
+        const userRole = user.email && isAdminEmail(user.email) ? 'admin' : ((user as any).role || 'user');
+        
         return {
           ...token,
           userId: user.id,
-          role: (user as any).role || "user",
+          role: userRole,
           accessToken: account.access_token,
           refreshToken: account.refresh_token,
         };
       }
-      console.log("JWT callback - Subsequent request:", { tokenSub: token.sub });
+      
+      // On subsequent requests, always check if this email should be admin
+      // This ensures admin status is always correctly reflected
+      if (token.email) {
+        const shouldBeAdmin = isAdminEmail(token.email as string);
+        if (shouldBeAdmin && token.role !== 'admin') {
+          token.role = 'admin';
+        } else if (!token.role) {
+          token.role = 'user';
+        }
+      }
+      
+      console.log("JWT callback - Subsequent request:", { tokenSub: token.sub, email: token.email, role: token.role });
       return token;
     },
     async signIn({ user, account, profile }) {
@@ -162,6 +188,9 @@ export const authOptions: NextAuthOptions = {
           const existingUser = await db.collection('users').findOne({ email: user.email });
           console.log('Existing user check:', { found: !!existingUser });
           
+          // Determine user role - admin for specific emails
+          const userRole = isAdminEmail(user.email) ? 'admin' : 'user';
+          
           // If this is a new user coming from Google, set up their collections
           if (!existingUser || (existingUser && !existingUser.hasInitializedCollections)) {
             // For new users, we need to wait for MongoDB adapter to create the user
@@ -177,21 +206,28 @@ export const authOptions: NextAuthOptions = {
               const userId = dbUser._id.toString();
               await initializeUserCollections(db, userId);
               
-              // Mark the user as having initialized collections
+              // Mark the user as having initialized collections and set role
               await db.collection('users').updateOne(
                 { _id: dbUser._id },
                 { 
                   $set: { 
                     hasInitializedCollections: true,
-                    role: 'user',
+                    role: userRole,
                     updatedAt: new Date()
                   } 
                 }
               );
-              console.log('User collections initialized for:', user.email);
+              console.log('User collections initialized for:', user.email, 'with role:', userRole);
             } else {
               console.log('User not found in database after OAuth sign-in:', user.email);
             }
+          } else if (existingUser && isAdminEmail(user.email) && existingUser.role !== 'admin') {
+            // Update existing user to admin if they're in the admin list
+            await db.collection('users').updateOne(
+              { _id: existingUser._id },
+              { $set: { role: 'admin', updatedAt: new Date() } }
+            );
+            console.log('Updated existing user to admin:', user.email);
           }
         }
         return true;
