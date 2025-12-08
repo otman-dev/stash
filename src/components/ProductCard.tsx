@@ -77,13 +77,31 @@ export default function ProductCard({
       >
       {selectable && (
         <div className="absolute top-3 left-3 z-10">
-          <label className="inline-flex">
-            <input 
-              type="checkbox" 
-              className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              checked={selected}
-              onChange={handleSelect}
-            />
+          <label className="inline-flex cursor-pointer">
+            <div className="relative">
+              <input 
+                type="checkbox" 
+                className="peer sr-only"
+                checked={selected}
+                onChange={handleSelect}
+              />
+              <div className={`w-5 h-5 border-2 rounded bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-200 ${
+                selected 
+                  ? 'bg-blue-600 border-blue-600' 
+                  : 'border-slate-300 hover:border-blue-400'
+              }`}>
+                <svg 
+                  className={`w-full h-full text-white p-0.5 transition-opacity duration-200 ${
+                    selected ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
             <span className="sr-only">Select {product.name}</span>
           </label>
         </div>
