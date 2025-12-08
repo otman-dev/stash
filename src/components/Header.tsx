@@ -143,7 +143,7 @@ export default function Header() {
             <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
               <h3 className="text-sm font-medium text-blue-800 mb-2">Need help?</h3>
               <p className="text-xs text-blue-600 mb-3">Check our documentation for tips and tutorials.</p>
-              <a href="#" className="text-xs font-medium text-blue-700 hover:text-blue-800 flex items-center">
+              <a href="https://github.com/otman-dev/stash/blob/master/docs/USER_GUIDE.md" target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-blue-700 hover:text-blue-800 flex items-center">
                 View Documentation
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
