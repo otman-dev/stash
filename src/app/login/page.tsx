@@ -22,8 +22,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div dir={dir} className="min-h-screen flex bg-gradient-to-br from-blue-50 via-white to-slate-50">
-      {/* Left panel with decorative content */}
+    <div dir={dir} className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-blue-50 via-white to-slate-50">
+      {/* Mobile branding header */}
+      <div className="lg:hidden bg-gradient-to-br from-blue-600 to-blue-800 p-6 text-center">
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <Logo className="w-12 h-12" />
+          <div className="text-white text-left">
+            <div className="text-2xl font-bold">{t('common.stash')}</div>
+            <div className="text-sm opacity-80">{t('common.tagline')}</div>
+          </div>
+        </div>
+        <p className="text-blue-100 text-sm max-w-sm mx-auto">{t('home.hero.description')}</p>
+      </div>
+
+      {/* Left panel with decorative content - desktop only */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 p-12 flex-col justify-between relative overflow-hidden">
         <div className="absolute inset-0 bg-blue-800 opacity-10">
           <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -52,9 +64,9 @@ export default function LoginPage() {
       </div>
       
       {/* Right panel with login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 flex-1">
         <div className="w-full max-w-md">
-          <div className="flex items-center justify-between mb-12">
+          <div className="hidden lg:flex items-center justify-between mb-12">
             <div className="flex items-center gap-3">
               <Logo />
               <div>
@@ -62,6 +74,11 @@ export default function LoginPage() {
                 <div className="text-xs text-slate-500">{t('common.tagline')}</div>
               </div>
             </div>
+            <LanguageSwitcher />
+          </div>
+          
+          {/* Mobile language switcher */}
+          <div className="lg:hidden flex justify-end mb-6">
             <LanguageSwitcher />
           </div>
           
