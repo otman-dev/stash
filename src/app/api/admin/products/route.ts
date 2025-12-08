@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth-options';
 import { getDb } from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
 
 export async function GET() {
   try {
@@ -21,11 +22,24 @@ export async function GET() {
     const users = await db.collection('users').find({}).toArray();
     const userMap = new Map(users.map(u => [u._id.toString(), { name: u.name, email: u.email }]));
     
-    // Get all product collections
+    // Get all collections
     const collections = await db.listCollections().toArray();
-    const productCollections = collections
-      .map((c: any) => c.name)
-      .filter((name: string) => name.startsWith('products_'));
+    const collectionNames = collections.map((c: any) => c.name);
+    const productCollections = collectionNames.filter((name: string) => name.startsWith('products_'));
+    
+    // Build a map of all categories from all users
+    const categoryMap = new Map<string, string>();
+    const categoryCollections = collectionNames.filter((name: string) => name.startsWith('categories_'));
+    
+    for (const collName of categoryCollections) {
+      const categories = await db.collection(collName)
+        .find({ name: { $ne: 'Collection Metadata' } })
+        .toArray();
+      
+      categories.forEach(cat => {
+        categoryMap.set(cat._id.toString(), cat.name);
+      });
+    }
     
     // Fetch all products from all collections
     const allProducts: any[] = [];
@@ -39,6 +53,15 @@ export async function GET() {
       const ownerInfo = userMap.get(ownerId) || { name: 'Unknown', email: 'Unknown' };
       
       products.forEach(product => {
+        // Look up category name from categoryId
+        let categoryName = null;
+        if (product.categoryId) {
+          const catId = typeof product.categoryId === 'string' 
+            ? product.categoryId 
+            : product.categoryId.toString();
+          categoryName = categoryMap.get(catId) || null;
+        }
+        
         allProducts.push({
           _id: product._id.toString(),
           name: product.name,
@@ -46,7 +69,7 @@ export async function GET() {
           price: product.price,
           units: product.units,
           media: product.media,
-          category: product.category,
+          category: categoryName,
           createdAt: product.createdAt,
           ownerId,
           ownerName: ownerInfo.name,
