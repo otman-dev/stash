@@ -6,7 +6,8 @@ interface Product {
   name: string
   description?: string
   price?: number
-  quantity?: number
+  units?: number
+  media?: string[]
   category?: string
   createdAt: string
   ownerId: string
@@ -87,9 +88,10 @@ export default function AdminProductsPage() {
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">Image</th>
                 <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">Product</th>
                 <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">Price</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">Quantity</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">Units</th>
                 <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">Category</th>
                 <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">Owner</th>
                 <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">Created</th>
@@ -98,6 +100,21 @@ export default function AdminProductsPage() {
             <tbody className="divide-y divide-slate-200">
               {filteredProducts.map((product) => (
                 <tr key={product._id} className="hover:bg-slate-50">
+                  <td className="px-6 py-4">
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
+                      {product.media && product.media.length > 0 ? (
+                        <img 
+                          src={product.media[0]} 
+                          alt={product.name} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-4">
                     <div>
                       <p className="font-medium text-slate-800">{product.name}</p>
@@ -109,7 +126,7 @@ export default function AdminProductsPage() {
                   <td className="px-6 py-4 text-slate-600">
                     {product.price ? `$${product.price.toFixed(2)}` : '-'}
                   </td>
-                  <td className="px-6 py-4 text-slate-600">{product.quantity ?? '-'}</td>
+                  <td className="px-6 py-4 text-slate-600">{product.units ?? '-'}</td>
                   <td className="px-6 py-4">
                     {product.category ? (
                       <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
