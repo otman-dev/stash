@@ -21,6 +21,8 @@ export default function CategoriesPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false)
   const { showToast } = useToast()
 
   // Predefined category colors
@@ -110,6 +112,42 @@ export default function CategoriesPage() {
     setOpen(true)
   }
 
+  function handleSelectCategory(categoryId: string, selected: boolean) {
+    if (selected) {
+      setSelectedCategories(prev => [...prev, categoryId])
+    } else {
+      setSelectedCategories(prev => prev.filter(id => id !== categoryId))
+    }
+  }
+
+  function handleSelectAllCategories(selected: boolean) {
+    if (selected && filteredCategories) {
+      setSelectedCategories(filteredCategories.map(c => c._id))
+    } else {
+      setSelectedCategories([])
+    }
+  }
+
+  async function handleBulkDelete() {
+    setIsDeleting(true)
+    try {
+      await Promise.all(
+        selectedCategories.map(id => 
+          fetch(`/api/categories/${id}`, { method: 'DELETE' })
+        )
+      )
+      showToast(`${selectedCategories.length} categories deleted successfully`, 'success')
+      setSelectedCategories([])
+      mutate()
+      setBulkDeleteModalOpen(false)
+    } catch (error) {
+      console.error('Error deleting categories:', error)
+      showToast('Error deleting some categories', 'error')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
@@ -184,8 +222,8 @@ export default function CategoriesPage() {
       </div>
       
       <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <div className="flex items-center mb-6">
-          <div className="relative w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+          <div className="relative flex-1">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
@@ -199,7 +237,51 @@ export default function CategoriesPage() {
               placeholder="Search categories..." 
             />
           </div>
+          
+          {selectedCategories.length > 0 && (
+            <button
+              onClick={() => setBulkDeleteModalOpen(true)}
+              className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              Delete ({selectedCategories.length})
+            </button>
+          )}
         </div>
+
+        {filteredCategories && filteredCategories.length > 0 && (
+          <div className="mb-4 flex items-center">
+            <label className="inline-flex items-center cursor-pointer group">
+              <div className="relative">
+                <input 
+                  type="checkbox" 
+                  className="peer sr-only"
+                  checked={filteredCategories.length > 0 && selectedCategories.length === filteredCategories.length}
+                  onChange={(e) => handleSelectAllCategories(e.target.checked)}
+                />
+                <div className={`w-5 h-5 border-2 rounded shadow-sm transition-all duration-200 ${
+                  filteredCategories.length > 0 && selectedCategories.length === filteredCategories.length
+                    ? 'bg-blue-600 border-blue-600' 
+                    : 'bg-white border-slate-300 hover:border-blue-400'
+                }`}>
+                  <svg 
+                    className={`w-full h-full text-white p-0.5 transition-opacity duration-200 ${
+                      filteredCategories.length > 0 && selectedCategories.length === filteredCategories.length ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+              <span className="ml-2 text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">Select all</span>
+            </label>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -215,13 +297,48 @@ export default function CategoriesPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
-                  className="relative group bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
+                  className={`relative group bg-white rounded-lg border overflow-hidden hover:shadow-md transition-all ${
+                    selectedCategories.includes(category._id) 
+                      ? 'border-blue-500 ring-2 ring-blue-200' 
+                      : 'border-slate-200'
+                  }`}
                 >
+                  {/* Selection checkbox */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <label className="inline-flex cursor-pointer">
+                      <div className="relative">
+                        <input 
+                          type="checkbox" 
+                          className="peer sr-only"
+                          checked={selectedCategories.includes(category._id)}
+                          onChange={(e) => handleSelectCategory(category._id, e.target.checked)}
+                        />
+                        <div className={`w-5 h-5 border-2 rounded shadow-sm transition-all duration-200 ${
+                          selectedCategories.includes(category._id) 
+                            ? 'bg-blue-600 border-blue-600' 
+                            : 'bg-white/90 backdrop-blur-sm border-slate-300 hover:border-blue-400'
+                        }`}>
+                          <svg 
+                            className={`w-full h-full text-white p-0.5 transition-opacity duration-200 ${
+                              selectedCategories.includes(category._id) ? 'opacity-100' : 'opacity-0'
+                            }`}
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      </div>
+                      <span className="sr-only">Select {category.name}</span>
+                    </label>
+                  </div>
+                  
                   <div 
                     className="absolute top-0 left-0 w-full h-1.5" 
                     style={{ backgroundColor: category.color || '#3B82F6' }}
                   ></div>
-                  <div className="p-5">
+                  <div className="p-5 pt-8">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-slate-800 text-lg truncate pr-2">
                         {category.name}
@@ -376,6 +493,17 @@ export default function CategoriesPage() {
         title="Delete Category"
         message={`Are you sure you want to delete "${categoryToDelete?.name}"? Products in this category will become uncategorized.`}
         confirmText="Delete"
+        variant="danger"
+        isLoading={isDeleting}
+      />
+
+      <ConfirmModal
+        open={bulkDeleteModalOpen}
+        onClose={() => setBulkDeleteModalOpen(false)}
+        onConfirm={handleBulkDelete}
+        title="Delete Selected Categories"
+        message={`Are you sure you want to delete ${selectedCategories.length} selected categories? Products in these categories will become uncategorized.`}
+        confirmText={`Delete ${selectedCategories.length} Categories`}
         variant="danger"
         isLoading={isDeleting}
       />

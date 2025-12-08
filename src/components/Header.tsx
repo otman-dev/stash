@@ -15,7 +15,6 @@ const menuItems = [
 ]
 
 export default function Header() {
-  const [q, setQ] = useState('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, isAdmin, logout } = useAuth()
   const { t } = useLanguage()
@@ -57,22 +56,6 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
-          {/* Search - hidden on mobile, show in mobile menu */}
-          <div className="hidden md:block relative w-80 group">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <svg className="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <input 
-              aria-label={t('common.searchProducts')}
-              value={q} 
-              onChange={e => setQ(e.target.value)} 
-              placeholder={t('common.searchProducts')}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-colors" 
-            />
-          </div>
-          
           {isAdmin && (
             <Link 
               href="/admin" 
@@ -117,24 +100,6 @@ export default function Header() {
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-200 bg-white">
-          {/* Mobile search */}
-          <div className="p-4 border-b border-slate-100">
-            <div className="relative w-full group">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <input 
-                aria-label={t('common.searchProducts')}
-                value={q} 
-                onChange={e => setQ(e.target.value)} 
-                placeholder={t('common.searchProducts')}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-colors" 
-              />
-            </div>
-          </div>
-          
           <nav className="p-4 space-y-1">
             {menuItems.map((item) => (
               <Link

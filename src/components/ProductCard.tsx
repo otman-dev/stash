@@ -71,7 +71,7 @@ export default function ProductCard({
         whileHover={{ y: -4 }}
         role="article" 
         tabIndex={0} 
-        className={`group bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full ${
+        className={`group relative bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full ${
           selected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-slate-200'
         }`}
       >
@@ -85,10 +85,10 @@ export default function ProductCard({
                 checked={selected}
                 onChange={handleSelect}
               />
-              <div className={`w-5 h-5 border-2 rounded bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-200 ${
+              <div className={`w-5 h-5 border-2 rounded shadow-sm transition-all duration-200 ${
                 selected 
                   ? 'bg-blue-600 border-blue-600' 
-                  : 'border-slate-300 hover:border-blue-400'
+                  : 'bg-white/90 backdrop-blur-sm border-slate-300 hover:border-blue-400'
               }`}>
                 <svg 
                   className={`w-full h-full text-white p-0.5 transition-opacity duration-200 ${
