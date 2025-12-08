@@ -267,20 +267,6 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {filteredProducts && filteredProducts.length > 0 && (
-          <div className="mb-4 flex items-center">
-            <label className="inline-flex items-center">
-              <input 
-                type="checkbox" 
-                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                checked={filteredProducts.length > 0 && selectedProducts.length === filteredProducts.length}
-                onChange={(e) => handleSelectAllProducts(e.target.checked)}
-              />
-              <span className="ml-2 text-sm text-gray-700">Select all</span>
-            </label>
-          </div>
-        )}
-
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
