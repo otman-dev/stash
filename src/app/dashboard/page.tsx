@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import useSWR from '../../lib/swrClient'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -21,12 +21,52 @@ const item = {
   show: { opacity: 1, y: 0 }
 }
 
+// Helper function to check if a date is within a time range
+function isWithinRange(dateString: string | undefined, range: 'week' | 'month' | 'year'): boolean {
+  if (!dateString) return false;
+  
+  const date = new Date(dateString);
+  const now = new Date();
+  
+  switch (range) {
+    case 'week': {
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      return date >= weekAgo;
+    }
+    case 'month': {
+      const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      return date >= monthAgo;
+    }
+    case 'year': {
+      const yearStart = new Date(now.getFullYear(), 0, 1);
+      return date >= yearStart;
+    }
+    default:
+      return false;
+  }
+}
+
 export default function DashboardPage() {
   const { data: products, error: productsError, isLoading: productsLoading } = useSWR('/api/products', fetcher)
   const { data: categories, error: categoriesError, isLoading: categoriesLoading } = useSWR('/api/categories', fetcher)
-  const [dateRange, setDateRange] = useState('week')
+  const [dateRange, setDateRange] = useState<'week' | 'month' | 'year'>('week')
 
   const isLoading = productsLoading || categoriesLoading
+
+  // Calculate items added within the selected date range
+  const itemsAddedInRange = useMemo(() => {
+    if (!products || !Array.isArray(products)) return 0;
+    return products.filter((p: any) => isWithinRange(p.createdAt, dateRange)).length;
+  }, [products, dateRange]);
+
+  // Calculate categories added within the selected date range
+  const categoriesAddedInRange = useMemo(() => {
+    if (!categories || !Array.isArray(categories)) return 0;
+    return categories.filter((c: any) => isWithinRange(c.createdAt, dateRange)).length;
+  }, [categories, dateRange]);
+
+  // Total new items (products + categories) in range
+  const totalNewItems = itemsAddedInRange + categoriesAddedInRange;
 
   return (
     <div>
@@ -102,9 +142,11 @@ export default function DashboardPage() {
             </p>
             <div className="flex items-center text-blue-100">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
               </svg>
-              <span className="text-xs font-medium">12% increase</span>
+              <span className="text-xs font-medium">
+                {itemsAddedInRange > 0 ? `+${itemsAddedInRange} this ${dateRange}` : 'All time'}
+              </span>
             </div>
           </div>
           <Link href="/dashboard/products" className="absolute inset-0 focus:outline-none" aria-label="View all products">
@@ -132,9 +174,11 @@ export default function DashboardPage() {
             </p>
             <div className="flex items-center text-emerald-100">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
               </svg>
-              <span className="text-xs font-medium">5% increase</span>
+              <span className="text-xs font-medium">
+                {categoriesAddedInRange > 0 ? `+${categoriesAddedInRange} this ${dateRange}` : 'All time'}
+              </span>
             </div>
           </div>
           <Link href="/dashboard/categories" className="absolute inset-0 focus:outline-none" aria-label="View all categories">
@@ -162,9 +206,9 @@ export default function DashboardPage() {
             </p>
             <div className="flex items-center text-amber-100">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
               </svg>
-              <span className="text-xs font-medium">8% increase</span>
+              <span className="text-xs font-medium">In stock across all products</span>
             </div>
           </div>
         </motion.div>
@@ -179,13 +223,21 @@ export default function DashboardPage() {
             </svg>
           </div>
           <div className="relative">
-            <p className="text-violet-100 text-sm font-medium uppercase tracking-wide">{`This ${dateRange}`}</p>
-            <p className="text-4xl font-bold mt-2 mb-2">+{Math.floor(Math.random() * 10) + 1}</p>
+            <p className="text-violet-100 text-sm font-medium uppercase tracking-wide">This {dateRange}</p>
+            <p className="text-4xl font-bold mt-2 mb-2">
+              {isLoading ? (
+                <span className="inline-block w-16 h-9 bg-white/20 animate-pulse rounded"></span>
+              ) : (
+                `+${totalNewItems}`
+              )}
+            </p>
             <div className="flex items-center text-violet-100">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
               </svg>
-              <span className="text-xs font-medium">New items added</span>
+              <span className="text-xs font-medium">
+                {itemsAddedInRange} products, {categoriesAddedInRange} categories
+              </span>
             </div>
           </div>
         </motion.div>
