@@ -206,7 +206,7 @@ export const authOptions: NextAuthOptions = {
               const userId = dbUser._id.toString();
               await initializeUserCollections(db, userId);
               
-              // Mark the user as having initialized collections and set role
+              // Mark the user as having initialized collections, set role, and add createdAt
               await db.collection('users').updateOne(
                 { _id: dbUser._id },
                 { 
@@ -214,9 +214,21 @@ export const authOptions: NextAuthOptions = {
                     hasInitializedCollections: true,
                     role: userRole,
                     updatedAt: new Date()
-                  } 
+                  },
+                  $setOnInsert: {
+                    createdAt: new Date()
+                  }
                 }
               );
+              
+              // If createdAt doesn't exist, set it now (for users created before this fix)
+              if (!dbUser.createdAt) {
+                await db.collection('users').updateOne(
+                  { _id: dbUser._id, createdAt: { $exists: false } },
+                  { $set: { createdAt: new Date() } }
+                );
+              }
+              
               console.log('User collections initialized for:', user.email, 'with role:', userRole);
             } else {
               console.log('User not found in database after OAuth sign-in:', user.email);
