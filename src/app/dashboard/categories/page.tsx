@@ -156,11 +156,11 @@ export default function CategoriesPage() {
                 </div>
                 <div className="bg-purple-50 rounded-lg p-4">
                   <div className="text-purple-800 font-semibold text-lg">
-                    {(products?.length && categories?.length) ? 
-                      (products.length / categories.length).toFixed(1) : 0}
+                    {products?.length ? 
+                      Math.round((products.filter(p => p.categoryId).length / products.length) * 100) : 0}%
                   </div>
                   <div className="text-sm text-purple-600">
-                    Avg Products/Category
+                    Coverage Rate
                   </div>
                 </div>
               </div>
