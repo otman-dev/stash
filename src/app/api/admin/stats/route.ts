@@ -2,6 +2,17 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth-options';
 import { getDb } from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
+
+// Helper function to extract timestamp from MongoDB ObjectId
+function getCreatedAtFromObjectId(id: ObjectId | string): Date {
+  try {
+    const objectId = typeof id === 'string' ? new ObjectId(id) : id;
+    return objectId.getTimestamp();
+  } catch {
+    return new Date();
+  }
+}
 
 export async function GET() {
   try {
@@ -57,7 +68,7 @@ export async function GET() {
         _id: u._id.toString(),
         name: u.name,
         email: u.email,
-        createdAt: u.createdAt,
+        createdAt: u.createdAt || getCreatedAtFromObjectId(u._id),
       })),
     });
   } catch (error) {
