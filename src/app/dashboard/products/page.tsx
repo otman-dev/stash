@@ -267,6 +267,42 @@ export default function ProductsPage() {
           </div>
         </div>
 
+        {filteredProducts && filteredProducts.length > 0 && (
+          <div className="mb-4 flex items-center">
+            <label className="inline-flex items-center cursor-pointer group">
+              <div className="relative">
+                <input 
+                  type="checkbox" 
+                  className="peer sr-only"
+                  checked={filteredProducts.length > 0 && selectedProducts.length === filteredProducts.length}
+                  onChange={(e) => handleSelectAllProducts(e.target.checked)}
+                />
+                <div className="w-5 h-5 border-2 border-slate-300 rounded bg-white peer-checked:bg-blue-600 peer-checked:border-blue-600 peer-focus:ring-2 peer-focus:ring-blue-300 peer-focus:ring-offset-1 transition-all duration-200 group-hover:border-blue-400">
+                  <svg 
+                    className="w-full h-full text-white opacity-0 peer-checked:opacity-100 p-0.5" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <svg 
+                  className={`absolute top-0 left-0 w-5 h-5 text-white p-0.5 pointer-events-none transition-opacity duration-200 ${
+                    filteredProducts.length > 0 && selectedProducts.length === filteredProducts.length ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="ml-2 text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">Select all</span>
+            </label>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
