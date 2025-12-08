@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Product as ProductType } from '../lib/types'
+import ConfirmModal from './ConfirmModal'
 
 // Define a compatible product interface for the component
 interface Product extends Omit<ProductType, '_id'> {
@@ -33,15 +34,21 @@ export default function ProductCard({
   const thumb = product.media && product.media.length ? product.media[0] : null
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const [isImageError, setIsImageError] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   
   const handleEdit = () => {
     if (onEdit) onEdit(product)
   }
   
   const handleDelete = () => {
-    if (onDelete && window.confirm('Are you sure you want to delete this product?')) {
+    setShowDeleteConfirm(true)
+  }
+
+  const confirmDelete = () => {
+    if (onDelete) {
       onDelete(product._id)
     }
+    setShowDeleteConfirm(false)
   }
   
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,6 +174,16 @@ export default function ProductCard({
           </button>
         </div>
       </div>
+
+      <ConfirmModal
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={confirmDelete}
+        title="Delete Product"
+        message={`Are you sure you want to delete "${product.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+      />
     </motion.article>
   )
 }

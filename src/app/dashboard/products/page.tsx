@@ -3,6 +3,7 @@ import { useState, FormEvent, useRef } from 'react'
 import useSWR from '../../../lib/swrClient'
 import ProductCard from '../../../components/ProductCard'
 import Modal from '../../../components/Modal'
+import ConfirmModal from '../../../components/ConfirmModal'
 import { useToast } from '@/components/ToastContext'
 import { Product, Category } from '../../../lib/types'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -24,6 +25,8 @@ export default function ProductsPage() {
   const [preview, setPreview] = useState<string | null>(null)
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const [bulkActionOpen, setBulkActionOpen] = useState(false)
+  const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false)
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false)
   const { showToast } = useToast()
 
   // Check if user has any categories
@@ -117,26 +120,31 @@ export default function ProductsPage() {
     }
   }
   
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (selectedProducts.length === 0) return
-    
-    if (confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) {
-      try {
-        // In a real app, you might want to implement a bulk delete API
-        // For now, we'll delete them one by one
-        await Promise.all(
-          selectedProducts.map(id => 
-            fetch(`/api/products/${id}`, { method: 'DELETE' })
-          )
+    setBulkDeleteModalOpen(true)
+  }
+
+  const confirmBulkDelete = async () => {
+    setIsBulkDeleting(true)
+    try {
+      // In a real app, you might want to implement a bulk delete API
+      // For now, we'll delete them one by one
+      await Promise.all(
+        selectedProducts.map(id => 
+          fetch(`/api/products/${id}`, { method: 'DELETE' })
         )
-        
-        showToast(`${selectedProducts.length} products deleted successfully`, 'success')
-        setSelectedProducts([])
-        mutate()
-      } catch (error) {
-        console.error('Error deleting products:', error)
-        showToast('Error deleting products', 'error')
-      }
+      )
+      
+      showToast(`${selectedProducts.length} products deleted successfully`, 'success')
+      setSelectedProducts([])
+      mutate()
+      setBulkDeleteModalOpen(false)
+    } catch (error) {
+      console.error('Error deleting products:', error)
+      showToast('Error deleting products', 'error')
+    } finally {
+      setIsBulkDeleting(false)
     }
   }
   
@@ -564,6 +572,17 @@ export default function ProductsPage() {
           </div>
         </div>
       </Modal>
+
+      <ConfirmModal
+        open={bulkDeleteModalOpen}
+        onClose={() => setBulkDeleteModalOpen(false)}
+        onConfirm={confirmBulkDelete}
+        title="Delete Selected Products"
+        message={`Are you sure you want to delete ${selectedProducts.length} product${selectedProducts.length > 1 ? 's' : ''}? This action cannot be undone.`}
+        confirmText="Delete All"
+        variant="danger"
+        isLoading={isBulkDeleting}
+      />
     </div>
   )
 }

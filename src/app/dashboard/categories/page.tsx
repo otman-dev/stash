@@ -2,6 +2,7 @@
 import { useState, FormEvent } from 'react'
 import useSWR from '../../../lib/swrClient'
 import Modal from '../../../components/Modal'
+import ConfirmModal from '../../../components/ConfirmModal'
 import CategoryStats from '@/components/CategoryStats'
 import { useToast } from '@/components/ToastContext'
 import { Category, Product } from '../../../lib/types'
@@ -17,6 +18,9 @@ export default function CategoriesPage() {
   const [editMode, setEditMode] = useState(false)
   const [currentCategoryId, setCurrentCategoryId] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const { showToast } = useToast()
 
   // Predefined category colors
@@ -72,16 +76,26 @@ export default function CategoriesPage() {
     setOpen(true)
   }
 
-  async function deleteCategory(id: string) {
-    if (confirm('Are you sure you want to delete this category?')) {
-      try {
-        await fetch(`/api/categories/${id}`, { method: 'DELETE' })
-        showToast('Category deleted successfully', 'success')
-        mutate()
-      } catch (error) {
-        console.error('Error deleting category:', error)
-        showToast('Error deleting category', 'error')
-      }
+  function openDeleteModal(category: Category) {
+    setCategoryToDelete(category)
+    setDeleteModalOpen(true)
+  }
+
+  async function confirmDeleteCategory() {
+    if (!categoryToDelete) return
+    
+    setIsDeleting(true)
+    try {
+      await fetch(`/api/categories/${categoryToDelete._id}`, { method: 'DELETE' })
+      showToast('Category deleted successfully', 'success')
+      mutate()
+      setDeleteModalOpen(false)
+      setCategoryToDelete(null)
+    } catch (error) {
+      console.error('Error deleting category:', error)
+      showToast('Error deleting category', 'error')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -224,7 +238,7 @@ export default function CategoriesPage() {
                             <span className="sr-only">Edit</span>
                           </button>
                           <button 
-                            onClick={() => deleteCategory(category._id)}
+                            onClick={() => openDeleteModal(category)}
                             className="p-1.5 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -353,6 +367,20 @@ export default function CategoriesPage() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmModal
+        open={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false)
+          setCategoryToDelete(null)
+        }}
+        onConfirm={confirmDeleteCategory}
+        title="Delete Category"
+        message={`Are you sure you want to delete "${categoryToDelete?.name}"? Products in this category will become uncategorized.`}
+        confirmText="Delete"
+        variant="danger"
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { useToast } from '@/components/ToastContext'
 
 interface User {
   _id: string
@@ -22,6 +23,7 @@ export default function AdminUsersPage() {
   const [deletingUser, setDeletingUser] = useState<string | null>(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const { showToast } = useToast()
 
   useEffect(() => {
     async function fetchUsers() {
@@ -50,9 +52,10 @@ export default function AdminUsersPage() {
       if (!res.ok) throw new Error('Failed to update role')
       
       setUsers(users.map(u => u._id === userId ? { ...u, role: newRole } : u))
+      showToast('User role updated successfully', 'success')
     } catch (err) {
       console.error('Error updating role:', err)
-      alert('Failed to update user role')
+      showToast('Failed to update user role', 'error')
     }
   }
 
@@ -81,10 +84,11 @@ export default function AdminUsersPage() {
       }
       
       setUsers(users.filter(u => u._id !== userToDelete._id))
+      showToast('User deleted successfully', 'success')
       closeDeleteModal()
     } catch (err: any) {
       console.error('Error deleting user:', err)
-      alert(err.message || 'Failed to delete user')
+      showToast(err.message || 'Failed to delete user', 'error')
     } finally {
       setDeletingUser(null)
     }
