@@ -63,17 +63,18 @@ export default function ProductCard({
   }
   
   return (
-    <motion.article 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      whileHover={{ y: -4 }}
-      role="article" 
-      tabIndex={0} 
-      className={`group bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full ${
-        selected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-slate-200'
-      }`}
-    >
+    <>
+      <motion.article 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        whileHover={{ y: -4 }}
+        role="article" 
+        tabIndex={0} 
+        className={`group bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full ${
+          selected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-slate-200'
+        }`}
+      >
       {selectable && (
         <div className="absolute top-3 left-3 z-10">
           <label className="inline-flex">
@@ -182,6 +183,7 @@ export default function ProductCard({
           </button>
         </div>
       </div>
+      </motion.article>
 
       <ConfirmModal
         open={showDeleteConfirm}
@@ -353,6 +355,6 @@ export default function ProductCard({
           </div>
         )}
       </AnimatePresence>
-    </motion.article>
+    </>
   )
 }
