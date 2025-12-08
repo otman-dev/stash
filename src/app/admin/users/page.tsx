@@ -54,7 +54,7 @@ export default function AdminUsersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-purple-500 rounded-full"></div>
+        <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-blue-500 rounded-full"></div>
       </div>
     )
   }
@@ -93,7 +93,7 @@ export default function AdminUsersPage() {
                 <tr key={user._id} className="hover:bg-slate-50">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white font-medium">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-medium">
                         {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || '?'}
                       </div>
                       <span className="font-medium text-slate-800">{user.name || 'No name'}</span>
@@ -103,8 +103,8 @@ export default function AdminUsersPage() {
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       user.role === 'admin' 
-                        ? 'bg-purple-100 text-purple-700' 
-                        : 'bg-blue-100 text-blue-700'
+                        ? 'bg-blue-100 text-blue-700' 
+                        : 'bg-slate-100 text-slate-700'
                     }`}>
                       {user.role || 'user'}
                     </span>
@@ -118,7 +118,7 @@ export default function AdminUsersPage() {
                     <select
                       value={user.role || 'user'}
                       onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                      className="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-purple-300 focus:border-purple-500"
+                      className="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-300 focus:border-blue-500"
                     >
                       <option value="user">User</option>
                       <option value="admin">Admin</option>
