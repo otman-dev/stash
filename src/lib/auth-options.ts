@@ -54,7 +54,7 @@ async function initializeUserCollections(db: any, userId: string) {
 export const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(clientPromise) as any,
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NEXTAUTH_DEBUG === 'true' || process.env.NODE_ENV === 'development',
+  debug: true, // Force debug mode to see OAuth errors
   // Make sure the callback URL works in both production and development
   useSecureCookies: process.env.NODE_ENV === 'production',
   cookies: {
@@ -78,7 +78,17 @@ export const authOptions: NextAuthOptions = {
           access_type: "offline",
           response_type: "code"
         }
-      }
+      },
+      // Add logging for debugging
+      profile(profile) {
+        console.log("Google Profile received:", profile);
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+        };
+      },
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -119,7 +129,26 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: "/login",
-    error: "/login",
+    error: "/login", // Will redirect with ?error=OAuthCallback etc
+  },
+  events: {
+    async signIn({ user, account, profile, isNewUser }) {
+      console.log("EVENT signIn:", { userEmail: user.email, provider: account?.provider, isNewUser });
+    },
+    async signOut({ token }) {
+      console.log("EVENT signOut:", { email: token?.email });
+    },
+  },
+  logger: {
+    error(code, metadata) {
+      console.error("NextAuth Error:", code, metadata);
+    },
+    warn(code) {
+      console.warn("NextAuth Warning:", code);
+    },
+    debug(code, metadata) {
+      console.log("NextAuth Debug:", code, metadata);
+    },
   },
   session: {
     strategy: "jwt",
