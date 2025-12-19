@@ -6,6 +6,27 @@ import Link from 'next/link'
 
 const fetcher = (url: string) => fetch(url).then(r => r.json())
 
+// Function to download inventory report
+async function downloadInventoryReport() {
+  try {
+    const response = await fetch('/api/inventory-report');
+    if (!response.ok) throw new Error('Failed to generate report');
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `inventory-report-${new Date().toISOString().split('T')[0]}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error('Error downloading report:', error);
+    alert('Failed to download inventory report. Please try again.');
+  }
+}
+
 const container = {
   hidden: { opacity: 0 },
   show: {
@@ -400,12 +421,15 @@ export default function DashboardPage() {
                   </div>
                   
                   <div className="mt-8 pt-6 border-t border-slate-100">
-                    <Link href="/dashboard/products" className="flex items-center justify-center w-full py-2.5 px-4 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors font-medium text-sm">
+                    <button 
+                      onClick={downloadInventoryReport}
+                      className="flex items-center justify-center w-full py-2.5 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium text-sm"
+                    >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      Generate Inventory Report
-                    </Link>
+                      Download Inventory Report (Excel)
+                    </button>
                   </div>
                 </>
               )}
