@@ -3,6 +3,7 @@ import { LanguageProvider } from "@/i18n/LanguageContext";
 import AuthProvider from "@/components/AuthProvider";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-options";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -43,6 +44,7 @@ export default async function RootLayout({
             {children}
           </LanguageProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
