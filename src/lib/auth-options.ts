@@ -54,7 +54,7 @@ async function initializeUserCollections(db: any, userId: string) {
 export const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(clientPromise) as any,
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true, // Force debug mode to see OAuth errors
+  debug: process.env.NODE_ENV === 'development', // Only enable debug in development
   // Make sure the callback URL works in both production and development
   useSecureCookies: process.env.NODE_ENV === 'production',
   cookies: {
@@ -72,16 +72,19 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true, // Allow linking when user already exists with same email
       authorization: {
         params: {
-          prompt: "consent",
+          prompt: "select_account", // Changed from "consent" to reduce OAuth traffic
           access_type: "offline",
           response_type: "code"
         }
       },
       // Add logging for debugging
       profile(profile) {
-        console.log("Google Profile received:", profile);
+        if (process.env.NODE_ENV === 'development') {
+          console.log("Google Profile received:", profile);
+        }
         return {
           id: profile.sub,
           name: profile.name,
@@ -133,10 +136,45 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     async signIn({ user, account, profile, isNewUser }) {
-      console.log("EVENT signIn:", { userEmail: user.email, provider: account?.provider, isNewUser });
+      if (process.env.NODE_ENV === 'development') {
+        console.log("EVENT signIn:", { userEmail: user.email, provider: account?.provider, isNewUser });
+      }
     },
     async signOut({ token }) {
-      console.log("EVENT signOut:", { email: token?.email });
+      if (process.env.NODE_ENV === 'development') {
+        console.log("EVENT signOut:", { email: token?.email });
+      }
+    },
+    async createUser({ user }) {
+      // Initialize collections for newly created users
+      try {
+        if (user.email) {
+          const db = await getDb();
+          const userRole = isAdminEmail(user.email) ? 'admin' : 'user';
+          const userId = user.id;
+          
+          await initializeUserCollections(db, userId);
+          
+          // Update the newly created user with role and initialization flag
+          await db.collection('users').updateOne(
+            { email: user.email },
+            { 
+              $set: { 
+                hasInitializedCollections: true,
+                role: userRole,
+                createdAt: new Date(),
+                updatedAt: new Date()
+              }
+            }
+          );
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('New user created and collections initialized:', user.email);
+          }
+        }
+      } catch (error) {
+        console.error('Error initializing new user collections:', error);
+      }
     },
   },
   logger: {
@@ -144,10 +182,16 @@ export const authOptions: NextAuthOptions = {
       console.error("NextAuth Error:", code, metadata);
     },
     warn(code) {
-      console.warn("NextAuth Warning:", code);
+      // Only log warnings in development
+      if (process.env.NODE_ENV === 'development') {
+        console.warn("NextAuth Warning:", code);
+      }
     },
     debug(code, metadata) {
-      console.log("NextAuth Debug:", code, metadata);
+      // Only log debug in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log("NextAuth Debug:", code, metadata);
+      }
     },
   },
   session: {
@@ -164,17 +208,22 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub;
         session.user.role = token.role as string || "user";
       }
-      console.log("Session callback:", { sessionUser: session?.user });
+      // Only log in development to reduce noise
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Session callback:", { sessionUser: session?.user });
+      }
       return session;
     },
     async jwt({ token, user, account, profile }) {
       // Initial sign in - persist the user data to the token
       if (account && user) {
-        console.log("JWT callback - Initial sign in:", { 
-          provider: account.provider, 
-          userId: user.id, 
-          email: user.email 
-        });
+        if (process.env.NODE_ENV === 'development') {
+          console.log("JWT callback - Initial sign in:", { 
+            provider: account.provider, 
+            userId: user.id, 
+            email: user.email 
+          });
+        }
         
         // Check if user should be admin
         const userRole = user.email && isAdminEmail(user.email) ? 'admin' : ((user as any).role || 'user');
@@ -199,77 +248,52 @@ export const authOptions: NextAuthOptions = {
         }
       }
       
-      console.log("JWT callback - Subsequent request:", { tokenSub: token.sub, email: token.email, role: token.role });
       return token;
     },
     async signIn({ user, account, profile }) {
       try {
-        console.log('SignIn callback triggered:', { 
-          provider: account?.provider,
-          email: user.email,
-          name: user.name
-        });
+        if (process.env.NODE_ENV === 'development') {
+          console.log('SignIn callback triggered:', { 
+            provider: account?.provider,
+            email: user.email,
+            name: user.name
+          });
+        }
         
         if (account?.provider === 'google' && user.email) {
           const db = await getDb();
           
-          // Check if the user already exists in our database
-          const existingUser = await db.collection('users').findOne({ email: user.email });
-          console.log('Existing user check:', { found: !!existingUser });
-          
           // Determine user role - admin for specific emails
           const userRole = isAdminEmail(user.email) ? 'admin' : 'user';
           
-          // If this is a new user coming from Google, set up their collections
-          if (!existingUser || (existingUser && !existingUser.hasInitializedCollections)) {
-            // For new users, we need to wait for MongoDB adapter to create the user
-            // and then use the MongoDB _id to initialize collections
+          // Check if the user already exists in our database
+          const existingUser = await db.collection('users').findOne({ email: user.email });
+          
+          if (existingUser) {
+            // User exists - update role if needed and ensure collections are initialized
+            const updates: any = { updatedAt: new Date() };
             
-            // Wait a bit to ensure the adapter has created the user
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Find the user by email since the ID might not be a valid MongoDB ObjectId
-            const dbUser = await db.collection('users').findOne({ email: user.email });
-            
-            if (dbUser) {
-              const userId = dbUser._id.toString();
-              await initializeUserCollections(db, userId);
-              
-              // Mark the user as having initialized collections, set role, and add createdAt
-              await db.collection('users').updateOne(
-                { _id: dbUser._id },
-                { 
-                  $set: { 
-                    hasInitializedCollections: true,
-                    role: userRole,
-                    updatedAt: new Date()
-                  },
-                  $setOnInsert: {
-                    createdAt: new Date()
-                  }
-                }
-              );
-              
-              // If createdAt doesn't exist, set it now (for users created before this fix)
-              if (!dbUser.createdAt) {
-                await db.collection('users').updateOne(
-                  { _id: dbUser._id, createdAt: { $exists: false } },
-                  { $set: { createdAt: new Date() } }
-                );
-              }
-              
-              console.log('User collections initialized for:', user.email, 'with role:', userRole);
-            } else {
-              console.log('User not found in database after OAuth sign-in:', user.email);
+            if (isAdminEmail(user.email) && existingUser.role !== 'admin') {
+              updates.role = 'admin';
             }
-          } else if (existingUser && isAdminEmail(user.email) && existingUser.role !== 'admin') {
-            // Update existing user to admin if they're in the admin list
+            
+            if (!existingUser.hasInitializedCollections) {
+              const userId = existingUser._id.toString();
+              await initializeUserCollections(db, userId);
+              updates.hasInitializedCollections = true;
+            }
+            
+            if (!existingUser.createdAt) {
+              updates.createdAt = new Date();
+            }
+            
             await db.collection('users').updateOne(
               { _id: existingUser._id },
-              { $set: { role: 'admin', updatedAt: new Date() } }
+              { $set: updates }
             );
-            console.log('Updated existing user to admin:', user.email);
           }
+          // For new users, the adapter will create them.
+          // We'll initialize collections in the createUser event or on first dashboard access
         }
         return true;
       } catch (error) {
