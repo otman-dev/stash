@@ -57,6 +57,8 @@ export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === 'development', // Only enable debug in development
   // Make sure the callback URL works in both production and development
   useSecureCookies: process.env.NODE_ENV === 'production',
+  // Allow linking accounts with same email (fixes OAuth callback loop)
+  allowDangerousEmailAccountLinking: true,
   cookies: {
     sessionToken: {
       name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
@@ -72,7 +74,6 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true, // Allow linking when user already exists with same email
       authorization: {
         params: {
           prompt: "select_account", // Changed from "consent" to reduce OAuth traffic
