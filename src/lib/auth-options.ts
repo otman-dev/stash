@@ -54,19 +54,17 @@ async function initializeUserCollections(db: any, userId: string) {
 export const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(clientPromise) as any,
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development', // Only enable debug in development
-  // Make sure the callback URL works in both production and development
-  useSecureCookies: process.env.NODE_ENV === 'production',
+  debug: true, // Enable debug to troubleshoot
   // Allow linking accounts with same email (fixes OAuth callback loop)
   allowDangerousEmailAccountLinking: true,
   cookies: {
     sessionToken: {
-      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+      name: `next-auth.session-token`,
       options: {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // Set to false for localhost
       },
     },
   },
